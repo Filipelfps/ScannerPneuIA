@@ -1,0 +1,40 @@
+🎯 Objetivo da Sprint 1
+Estabelecer a infraestrutura básica do projeto, criar a interface inicial para recebimento de imagens (via upload) e iniciar a pesquisa e coleta do dataset de pneus.
+📋 Tarefas da Sprint 1 (Backlog Selecionado)
+1. Definição da Arquitetura do Sistema (Épico 1)
+• Descrição: Definir o stack tecnológico. Como o motor de IA é o core, focar em um backend em Python (como FastAPI, que é excelente para servir modelos de Data Science e integra bem com bibliotecas de dados) e um frontend simples (HTML/JS/Tailwind ou React básico).
+• Checklist: * [ ] Esboçar o diagrama de arquitetura de software e dados.
+• [ ] Definir serviços em nuvem para o MVP (ex: Render, Heroku ou a camada gratuita da AWS).
+• Etiquetas: 🟢 Backend, 🔵 Frontend, 🟡 UX / UI
+2. Configuração de Repositórios e Ambiente (Épico 1)
+• Descrição: Criar os repositórios e preparar o ambiente de desenvolvimento local para evitar conflitos futuros.
+• Checklist:
+• [ ] Criar repositório no GitHub estruturado (ex: pastas separadas para /backend, /frontend e /model).
+• [ ] Configurar arquivos base (.gitignore, requirements.txt para pacotes Python, README.md).
+• [ ] Configurar um pipeline básico de CI (ex: GitHub Actions) apenas para linting de código.
+• Etiquetas: 🟢 Backend, 🔵 Frontend
+3. Coleta e Curadoria do Dataset de Pneus (Timeboxed) (Épico 3)
+• Descrição: Esta é uma tarefa investigativa crítica. Antes de treinar qualquer modelo, é preciso ter dados. A meta da semana não é finalizar, mas sim encontrar as fontes.
+• Checklist:
+• [ ] Pesquisar datasets públicos no Kaggle, Roboflow ou Google Dataset Search.
+• [ ] Baixar uma amostra inicial (ex: 100-200 imagens) cobrindo pneus novos e carecas.
+• [ ] Definir a estratégia de anotação (bounding boxes para o TWI ou classificação de imagem inteira?).
+• Etiquetas: 🟣 Data Science / IA
+4. Layout Base e Landing Page (Épico 2)
+• História do Usuário: "Como usuário, quero acessar uma interface web limpa e mobile-first que explique como o scanner de pneus funciona."
+• Checklist:
+• [ ] Criar a estrutura HTML/CSS focada em telas de celular.
+• [ ] Adicionar cabeçalho, texto explicativo simples e o botão de ação principal.
+• Etiquetas: 🔵 Frontend, 🟡 UX / UI
+5. Upload de Imagem da Galeria (MVP) (Épico 2 - Adaptação do Cartão 6)
+• História do Usuário: "Como usuário, quero fazer upload de uma foto do meu pneu para análise."
+• Nota: Focar no upload de arquivo tradicional (<input type="file">) nesta primeira semana garante que você tenha como enviar imagens para o backend sem a complexidade da integração nativa com a câmera agora.
+• Checklist:
+• [ ] Implementar o botão de upload na interface.
+• [ ] Mostrar um preview da imagem selecionada na tela.
+• Etiquetas: 🔵 Frontend
+🧊 O que fica para as próximas Sprints (Icebox temporário)
+Para manter a semana viável, os seguintes itens não entram na Sprint 1:
+• Integração direta com a câmera e overlay guia (Cartões 4 e 5).
+• Treinamento real do modelo e lógica matemática de vida útil (Cartões 8 e 9).
+• Criação da API e telas de diagnóstico final (Cartões 10, 11, 12 e 13).
