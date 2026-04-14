@@ -1,0 +1,69 @@
+
+🗂️ Épico 1: Setup e Infraestrutura
+(Tarefas técnicas para preparar o terreno)
+
+Cartão 1: Definição da Arquitetura do Sistema
+
+Descrição: Definir as tecnologias de Frontend (ex: React, HTML/JS puro), Backend (ex: Python/FastAPI ou Flask, considerando sua preferência) e a hospedagem.
+
+Checklist: Desenhar diagrama de arquitetura; escolher serviços de cloud (AWS, GCP ou Heroku); definir banco de dados (se houver necessidade de salvar histórico).
+
+Cartão 2: Configuração de Repositórios e CI/CD
+
+Descrição: Criar repositórios no GitHub (Frontend e Backend/IA) e configurar pipelines básicos de deploy contínuo.
+
+📸 Épico 2: Interface Web e Captura (Frontend)
+(A experiência direta do usuário com o scanner)
+
+Cartão 3: Layout Base e Landing Page
+
+História do Usuário: "Como usuário, quero acessar uma interface web limpa e mobile-first que explique como o scanner de pneus funciona."
+
+Cartão 4: Integração com a Câmera do Dispositivo
+
+História do Usuário: "Como usuário, quero permitir que o site acesse a câmera do meu celular para que eu possa escanear o pneu sem precisar instalar um app."
+
+Cartão 5: Overlay (Guia de Alinhamento na Tela)
+
+História do Usuário: "Como usuário, quero ver um contorno/guia na tela da câmera indicando a distância e o ângulo corretos para fotografar a banda de rodagem do pneu."
+
+Cartão 6: Upload de Imagem da Galeria (Plano B)
+
+História do Usuário: "Como usuário, quero ter a opção de fazer upload de uma foto que já tirei do pneu, caso eu esteja sem internet no momento da foto."
+
+🧠 Épico 3: Motor de Inteligência Artificial (O Core)
+(Aqui entra forte a parte de Data Science e Visão Computacional)
+
+Cartão 7: Coleta e Curadoria do Dataset de Pneus
+
+Tarefa: Buscar ou construir um dataset de imagens de pneus com diferentes níveis de desgaste (novos, meia-vida, TWI visível, carecas).
+
+Cartão 8: Treinamento do Modelo de Visão Computacional
+
+Tarefa: Desenvolver e treinar um modelo (ex: usando Python com TensorFlow, PyTorch ou YOLO) capaz de identificar a profundidade dos sulcos e o indicador de desgaste (TWI).
+
+Cartão 9: Algoritmo de Cálculo de Vida Útil
+
+Tarefa: Criar a lógica matemática/estatística que cruza o nível de desgaste detectado na imagem com uma estimativa de tempo/quilometragem restante para a troca.
+
+Cartão 10: Criação da API de Inferência (Backend)
+
+Tarefa: Encapsular o modelo de IA em uma API REST (ex: FastAPI) que receba a imagem do frontend, processe no modelo e devolva o diagnóstico estruturado em JSON.
+
+📊 Épico 4: Diagnóstico e Experiência do Usuário (UX)
+(Como o resultado é entregue para gerar valor)
+
+Cartão 11: Tela de Processamento (Loading State)
+
+História do Usuário: "Como usuário, quero ver uma animação de 'Analisando pneu com IA...' enquanto aguardo a resposta, para saber que o sistema está trabalhando."
+
+Cartão 12: Tela de Resultado do Diagnóstico
+
+História do Usuário: "Como usuário, quero ver um resultado visual claro indicando o estado do meu pneu (ex: um gráfico de barra de vida útil variando do verde ao vermelho)."
+
+Cartão 13: Recomendação de Troca e Dicas
+
+História do Usuário: "Como usuário, quero receber uma estimativa (ex: 'Recomendamos a troca em aprox. 5.000 km ou 6 meses') e dicas de manutenção (como calibragem e alinhamento)."
+
+
+  

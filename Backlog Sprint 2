@@ -1,0 +1,43 @@
+
+🎯 Objetivo da Sprint 2
+Estabelecer a comunicação entre as camadas do sistema (Front/Back), implementar o acesso nativo à câmera do celular e treinar a primeira versão (v1) do modelo de classificação de desgaste de pneus.
+📋 Tarefas da Sprint 2 (Backlog Selecionado)
+1. Integração com a Câmera e Overlay de Guia (Épico 2)
+• História do Usuário: "Como usuário, quero abrir a câmera diretamente pelo navegador e ver um guia de alinhamento para garantir que a foto do pneu fique nítida."
+• Descrição: Migrar do simples <input type="file"> para a MediaDevices API para captura em tempo real. Adicionar um elemento visual (overlay) que ajude o usuário a centralizar o pneu.
+• Checklist:
+• [ ] Implementar acesso à câmera traseira via JavaScript (getUserMedia).
+• [ ] Criar um componente de "máscara" visual (ex: um retângulo ou contorno de pneu) sobre o vídeo.
+• [ ] Adicionar botão de "Capturar" que converte o frame do vídeo em uma imagem (blob/base64).
+• Etiquetas: 🔵 Frontend, 🟡 UX / UI
+2. Treinamento do Modelo de Visão Computacional v1 (Épico 3)
+• Tarefa: Desenvolver o "cérebro" do projeto. Usar o dataset coletado na Sprint 1 para treinar um modelo capaz de distinguir, no mínimo, entre "Pneu Seguro" e "Pneu Careca/Risco".
+• Descrição: Utilizar Python (TensorFlow/Keras ou PyTorch). Como você é estudante de Engenharia de Software, foque primeiro em uma CNN (Rede Neural Convolucional) simples ou use Transfer Learning (MobileNetV2 é ideal por ser leve).
+• Checklist:
+• [ ] Pré-processar as imagens (redimensionamento e normalização).
+• [ ] Treinar o modelo e validar a acurácia (alcançar pelo menos 70-80% inicial).
+• [ ] Exportar o modelo treinado (formato .h5 ou .pth).
+• Etiquetas: 🟣 Data Science / IA
+3. Criação da API de Inferência com FastAPI (Épico 3)
+• Tarefa: Construir o endpoint que recebe a foto do frontend, passa pelo modelo de IA e devolve o resultado.
+• Descrição: Configurar o FastAPI para carregar o modelo em memória e processar requisições POST.
+• Checklist:
+• [ ] Criar o endpoint /predict que aceita arquivos de imagem.
+• [ ] Integrar o script de predição (IA) dentro da rota do FastAPI.
+• [ ] Retornar um JSON estruturado (ex: {"status": "careca", "confianca": 0.92}).
+• Etiquetas: 🟢 Backend, 🟣 Data Science / IA
+4. Tela de Loading e Resultado (Épico 4)
+• História do Usuário: "Como usuário, quero saber que a análise está acontecendo e ver o resultado de forma clara e visual."
+• Descrição: Criar os estados visuais após o envio da imagem. O resultado deve ser intuitivo (uso de cores tipo semáforo).
+• Checklist:
+• [ ] Criar componente de "Loading" animado (ex: "Analisando sulcos do pneu...").
+• [ ] Criar card de resultado que mude de cor: Verde (Bom), Amarelo (Atenção), Vermelho (Troca Imediata).
+• [ ] Exibir a porcentagem de confiança da IA.
+• Etiquetas: 🔵 Frontend, 🟡 UX / UI
+5. Configuração do Banco de Dados Inicial (Épico 1)
+• Descrição: Preparar o terreno para salvar o histórico das análises.
+• Checklist:
+• [ ] Configurar uma instância local de SQL (PostgreSQL ou SQLite para o MVP).
+• [ ] Criar a tabela analises (id, data, resultado, url_da_imagem).
+• Etiquetas: 🟢 Backend
+
