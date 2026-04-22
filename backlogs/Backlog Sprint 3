@@ -1,0 +1,10 @@
+Sprint 3: Arquitetura de Sistemas e Integração Full-Stack
+Objetivo: Criar a infraestrutura de comunicação para tornar a IA acessível ao usuário final.
+
+Desenvolvimento de API: Criação de um servidor robusto utilizando FastAPI para processar requisições em tempo real.
+
+Camada de Persistência: Implementação de um banco de dados SQLite para armazenamento automático do histórico de análises (Data, Diagnóstico e Confiança).
+
+Integração de Ponta a Ponta: Conexão do Frontend (Câmera via JavaScript) com o processamento da IA no Backend.
+
+Resultado: Sistema funcional onde a captura da imagem resulta em um diagnóstico instantâneo e registro no banco de dados.

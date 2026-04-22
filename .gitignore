@@ -1,0 +1,9 @@
+# Ignora as imagens de treinamento
+model/dataset/
+
+# Ignora o ambiente virtual
+.venv/
+
+# Ignora os modelos exportados pesados
+*.pth
+*.h5

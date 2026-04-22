@@ -1,0 +1,10 @@
+Sprint 2: Visão Computacional e Inteligência Artificial
+Objetivo: Desenvolver o "cérebro" do sistema capaz de interpretar imagens de desgaste automobilístico.
+
+Coleta e Curadoria de Dados: Criação de um dataset classificado em três níveis: Bom, Atenção e Careca.
+
+Arquitetura do Modelo: Implementação de uma rede neural convolucional (MobileNetV2) utilizando a biblioteca PyTorch.
+
+Técnica de Transfer Learning: Uso de pesos pré-treinados para otimizar o reconhecimento de padrões em imagens de pneus.
+
+Resultado: Geração do arquivo binário pneu_model_v1.pth (o modelo treinado)
