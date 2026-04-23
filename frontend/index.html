@@ -5,44 +5,137 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scanner de Pneus</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Overlay da câmera (guia de alinhamento) */
+        .camera-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70%;
+            height: 60%;
+            border: 4px dashed rgba(255, 255, 255, 0.7);
+            border-radius: 12px;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+        }
+    </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
-    
+
     <div class="bg-white p-6 rounded-2xl shadow-lg max-w-sm w-full text-center">
         <h1 class="text-2xl font-bold text-gray-800 mb-2">Scanner de Pneus</h1>
-        <p class="text-gray-500 text-sm mb-6">Faça o upload de uma foto nítida da banda de rodagem do seu pneu para analisarmos o nível de desgaste com base no TWI.</p>
+        <p class="text-gray-500 text-sm mb-6">Alinhe a banda de rodagem no guia e capture.</p>
 
-        <div class="mb-4">
-            <label for="file-upload" class="cursor-pointer bg-blue-50 hover:bg-blue-100 text-blue-600 font-semibold py-3 px-4 rounded-lg border-2 border-blue-200 border-dashed block w-full transition">
-                Selecionar Imagem
-            </label>
-            <input id="file-upload" type="file" accept="image/*" class="hidden" onchange="previewImage(event)" />
+        <div id="camera-container" class="relative w-full h-64 bg-black rounded-lg overflow-hidden mb-4 hidden">
+            <video id="camera-stream" class="w-full h-full object-cover" autoplay playsinline></video>
+            <div class="camera-overlay"></div>
         </div>
 
-        <div id="preview-container" class="hidden mb-6">
-            <img id="image-preview" src="#" alt="Preview do Pneu" class="w-full h-auto rounded-lg object-cover max-h-64 border border-gray-200" />
+        <div id="action-buttons" class="flex flex-col gap-3 mb-4">
+            <button id="btn-start-camera" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition">
+                Abrir Câmera
+            </button>
+            <button id="btn-capture" class="hidden w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition">
+                Capturar e Analisar
+            </button>
         </div>
 
-        <button disabled class="w-full bg-gray-300 text-gray-500 font-semibold py-3 px-4 rounded-lg cursor-not-allowed">
-            Analisar Desgaste (Backend na Sprint 2)
-        </button>
+        <canvas id="canvas" class="hidden"></canvas>
+
+        <div id="loading-state" class="hidden flex flex-col items-center justify-center py-6">
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-3"></div>
+            <p class="text-gray-600 font-medium">Analisando sulcos do pneu...</p>
+        </div>
+
+        <div id="result-card" class="hidden p-4 rounded-lg border-2 mt-4 transition-colors duration-300">
+            <h2 id="result-title" class="text-xl font-bold mb-1"></h2>
+            <p id="result-confidence" class="text-sm font-medium"></p>
+            <button onclick="location.reload()" class="mt-4 w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg transition">
+                Nova Análise
+            </button>
+        </div>
     </div>
 
     <script>
-        function previewImage(event) {
-            const input = event.target;
-            const previewContainer = document.getElementById('preview-container');
-            const imagePreview = document.getElementById('image-preview');
+        const video = document.getElementById('camera-stream');
+        const cameraContainer = document.getElementById('camera-container');
+        const btnStartCamera = document.getElementById('btn-start-camera');
+        const btnCapture = document.getElementById('btn-capture');
+        const canvas = document.getElementById('canvas');
+        const loadingState = document.getElementById('loading-state');
+        const resultCard = document.getElementById('result-card');
+        const resultTitle = document.getElementById('result-title');
+        const resultConfidence = document.getElementById('result-confidence');
 
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
+        // Inicializa a câmera
+        btnStartCamera.addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment' } // Prioriza câmera traseira
+                });
+                video.srcObject = stream;
+                cameraContainer.classList.remove('hidden');
+                btnStartCamera.classList.add('hidden');
+                btnCapture.classList.remove('hidden');
+            } catch (err) {
+                alert("Erro ao acessar a câmera: " + err.message);
+            }
+        });
 
-                reader.onload = function(e) {
-                    imagePreview.src = e.target.result;
-                    previewContainer.classList.remove('hidden'); // Mostra a div do preview
+        // Captura o frame e envia para a API
+        btnCapture.addEventListener('click', () => {
+            // Desenha o frame atual no canvas
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+
+            // Esconde câmera e mostra loading
+            cameraContainer.classList.add('hidden');
+            btnCapture.classList.add('hidden');
+            loadingState.classList.remove('hidden');
+
+            // Para a stream da câmera
+            video.srcObject.getTracks().forEach(track => track.stop());
+
+            // Converte para Blob e envia (Simulando o Fetch para o Backend)
+            canvas.toBlob(async (blob) => {
+                const formData = new FormData();
+                formData.append('file', blob, 'pneu.jpg');
+
+                try {
+                    // Endpoint do FastAPI (Ajuste a porta se necessário)
+                    const response = await fetch('http://localhost:8000/predict', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await response.json();
+                    showResult(data.status, data.confianca);
+                } catch (error) {
+                    console.error("Erro na API:", error);
+                    // Mock de fallback para testar UI se o back estiver offline
+                    setTimeout(() => showResult('careca', 0.94), 1500);
                 }
+            }, 'image/jpeg');
+        });
 
-                reader.readAsDataURL(input.files[0]);
+        // Atualiza a UI com base no resultado (Semáforo)
+        function showResult(status, confidence) {
+            loadingState.classList.add('hidden');
+            resultCard.classList.remove('hidden');
+
+            const pct = (confidence * 100).toFixed(1) + '%';
+            resultConfidence.innerText = `Confiança da IA: ${pct}`;
+
+            if (status === 'bom') {
+                resultCard.className = 'p-4 rounded-lg border-2 mt-4 bg-green-50 border-green-500 text-green-800';
+                resultTitle.innerText = 'Pneu Seguro ✅';
+            } else if (status === 'atencao') {
+                resultCard.className = 'p-4 rounded-lg border-2 mt-4 bg-yellow-50 border-yellow-500 text-yellow-800';
+                resultTitle.innerText = 'Atenção: Desgaste Moderado ⚠️';
+            } else {
+                resultCard.className = 'p-4 rounded-lg border-2 mt-4 bg-red-50 border-red-500 text-red-800';
+                resultTitle.innerText = 'Troca Imediata (Careca) ❌';
             }
         }
     </script>
