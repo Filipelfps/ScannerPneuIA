@@ -70,4 +70,4 @@ async def predict(file: UploadFile = File(...)):
     conn.commit()
     conn.close()
     
-    return {"status": resultado, "confianca": f"{confianca*100:.2f}%"}
+    return {"status": resultado, "confianca": f"{float(confianca)*100:.2f}%"}
