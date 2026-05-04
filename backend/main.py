@@ -8,7 +8,7 @@ from torchvision import models, transforms
 from PIL import Image
 import io
 
-# CORREÇÃO AQUI: Nome do sistema
+# Nome do sistema
 app = FastAPI(title="ScannerPneuIA API")
 
 app.add_middleware(
@@ -18,7 +18,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 1. Banco de Dados (Nome corrigido)
+# 1. Banco de Dados
 DB_FILE = "scanner_pneu.db"
 def init_db():
     conn = sqlite3.connect(DB_FILE)
@@ -50,12 +50,32 @@ transform = transforms.Compose([
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
 
+# 3. Regras de Negócio e Cálculo de Vida Útil (Sprint 4)
+# As chaves estão em minúsculo para bater exatamente com o dicionário CLASSES da sua IA
+DIAGNOSTICO_REGRAS = {
+    "bom": {
+        "km_restante": "Aprox. 30.000 km",
+        "dicas": ["Mantenha a calibragem quinzenal.", "Faça rodízio a cada 10.000 km."]
+    },
+    "atencao": {
+        "km_restante": "Entre 5.000 km e 10.000 km",
+        "dicas": ["Verifique o alinhamento e balanceamento.", "Prepare-se para a troca nos próximos meses."]
+    },
+    "careca": {
+        "km_restante": "0 km (Troca Imediata)",
+        "dicas": ["Risco extremo de aquaplanagem e multas.", "Substitua o pneu imediatamente.", "Não pegue estrada."]
+    }
+}
+
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
+    # Lê e processa a imagem
     image_bytes = await file.read()
     image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
     
     img_tensor = transform(image).unsqueeze(0)
+    
+    # Faz a predição com o modelo real PyTorch
     with torch.no_grad():
         outputs = model(img_tensor)
         probabilities = torch.nn.functional.softmax(outputs[0], dim=0)
@@ -63,6 +83,7 @@ async def predict(file: UploadFile = File(...)):
         
     resultado = CLASSES[idx.item()]
     
+    # Salva no Banco de Dados
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
     cursor.execute("INSERT INTO analises (data, resultado, confianca) VALUES (?, ?, ?)",
@@ -70,4 +91,17 @@ async def predict(file: UploadFile = File(...)):
     conn.commit()
     conn.close()
     
-    return {"status": resultado, "confianca": f"{float(confianca)*100:.2f}%"}
+    # Busca as estimativas e recomendações baseadas no resultado da IA
+    # Usamos .get() por segurança, caso a classe não seja encontrada no dicionário
+    dados_diagnostico = DIAGNOSTICO_REGRAS.get(resultado, {
+        "km_restante": "Indisponível", 
+        "dicas": ["Consulte um especialista automotivo."]
+    })
+    
+    # Retorna o JSON estruturado para o Frontend
+    return {
+        "status": resultado.capitalize(), # Capitalize para ficar "Bom", "Atencao", "Careca" no Frontend
+        "confianca": f"{float(confianca)*100:.2f}%",
+        "km_estimado": dados_diagnostico["km_restante"],
+        "dicas": dados_diagnostico["dicas"]
+    }
