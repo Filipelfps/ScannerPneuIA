@@ -1,0 +1,54 @@
+
+### 🎯 Objetivo da Sprint 4
+Transformar o diagnóstico técnico em inteligência preditiva, implementando o cálculo de vida útil restante, gerando recomendações personalizadas e refinando a interface de resultados para o usuário final.
+
+---
+
+### 📋 Tarefas da Sprint 4 (Backlog Selecionado)
+
+#### 1. Algoritmo de Cálculo de Vida Útil (Épico 3)
+*   **Descrição**: Criar a lógica matemática e estatística que cruza o nível de desgaste detectado pela IA (Bom, Atenção ou Careca) com uma estimativa de tempo ou quilometragem restante para a troca[cite: 3, 4].
+*   **Checklist**:
+    *   [ ] Definir constantes de quilometragem média para cada nível de desgaste (ex: Pneu "Bom" tem ~30.000 km restantes)[cite: 3].
+    *   [ ] Implementar função no Backend que processa o resultado do modelo e gera a estimativa numérica[cite: 2, 3].
+    *   [ ] Validar a lógica com dados técnicos de fabricantes de pneus[cite: 3].
+*   **Etiquetas**: 🟢 Backend, 🟣 Data Science / IA
+
+#### 2. Tela de Resultado do Diagnóstico e Visualização (Épico 4)
+*   **História do Usuário**: "Como usuário, quero ver um resultado visual claro indicando o estado do meu pneu, como um gráfico de barra de vida útil variando do verde ao vermelho"[cite: 3].
+*   **Checklist**:
+    *   [ ] Implementar um componente de "Gauge" (velocímetro) ou barra de progresso colorida no Frontend[cite: 3].
+    *   [ ] Integrar os dados de confiança da IA e quilometragem estimada na tela[cite: 2, 3].
+    *   [ ] Garantir que o design seja intuitivo para usuários leigos[cite: 3].
+*   **Etiquetas**: 🔵 Frontend, 🟡 UX / UI
+
+#### 3. Recomendações Dinâmicas e Dicas de Manutenção (Épico 4)
+*   **História do Usuário**: "Como usuário, quero receber recomendações de troca e dicas de manutenção (como calibragem e alinhamento) baseadas no estado atual do meu pneu"[cite: 3].
+*   **Checklist**:
+    *   [ ] Criar uma biblioteca de mensagens de conselho baseadas no diagnóstico (ex: se "Atenção", sugerir rodízio de pneus)[cite: 3].
+    *   [ ] Implementar a exibição dessas dicas logo abaixo do diagnóstico principal[cite: 3].
+*   **Etiquetas**: 🟡 UX / UI, 🔵 Frontend
+
+#### 4. Loading States e Feedback de Processamento (Épico 4)
+*   **História do Usuário**: "Como usuário, quero ver uma animação de 'Analisando pneu com IA...' enquanto aguardo a resposta, para saber que o sistema está trabalhando"[cite: 3].
+*   **Checklist**:
+    *   [ ] Criar uma tela ou modal de transição animada que aparece durante o POST para a API[cite: 3].
+    *   [ ] Adicionar mensagens aleatórias de "passo a passo" (ex: "Verificando sulcos...", "Calculando TWI...") para melhorar a percepção de valor[cite: 3].
+*   **Etiquetas**: 🔵 Frontend, 🟡 UX / UI
+
+#### 5. Preparação para Deploy e CI/CD (Épico 1)
+*   **Descrição**: Finalizar a configuração dos pipelines de deploy contínuo e escolher o serviço de nuvem para hospedar o MVP completo[cite: 1, 3].
+*   **Checklist**:
+    *   [ ] Configurar segredos de ambiente (API keys, DB URLs) no GitHub[cite: 3].
+    *   [ ] Realizar o deploy da versão "Release Candidate" em um serviço como AWS, Render ou Heroku[cite: 1, 3].
+    *   [ ] Testar o link público em dispositivos móveis reais[cite: 3].
+*   **Etiquetas**: 🟢 Backend, 🔵 Frontend
+
+---
+
+### 🧊 O que fica para o encerramento (Próximos Passos)
+Para manter o foco na entrega de valor nesta sprint, deixaremos para o fechamento:
+*   Exportação de relatórios detalhados em PDF para o usuário[cite: 3].
+*   Integração com mapas para sugerir oficinas próximas baseadas no diagnóstico[cite: 3].
+*   Autenticação completa de usuários (Login/Senha) para salvar frotas de veículos[cite: 3].
+
