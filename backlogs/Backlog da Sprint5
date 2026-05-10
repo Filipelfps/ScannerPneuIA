@@ -1,0 +1,49 @@
+### Objetivo da Sprint Final
+
+Melhorar a acurácia do diagnóstico aumentando a base de imagens de treinamento, implementar o guia visual da câmera e garantir um deploy estável e testado de ponta a ponta para a apresentação.
+
+---
+
+### 📋 Distribuição de Tarefas (Backlog Selecionado)
+
+### 1. Expansão do Dataset e Retreinamento (Core da IA)
+
+Como você tem um forte interesse em Data Science e análise de dados, essa tarefa técnica com o backend e o modelo fica no seu radar. O modelo atual (`pneu_model_v1.pth`) precisa evoluir para não dar falsos positivos.
+
+- **Responsável:** Leandro
+- **Checklist:**
+    - Coletar pelo menos mais 15-20 imagens para cada categoria (Bom, Atenção, Careca) para enriquecer o dataset original.
+    - Realizar o retreinamento rápido da rede neural (MobileNetV2 no PyTorch) usando Transfer Learning com as novas amostras.
+    - Atualizar o arquivo binário do modelo na API FastAPI para gerar inferências mais precisas.
+- **Etiquetas:** 🟣 Data Science / IA, 🟢 Backend
+
+### 2. Overlay e Guia de Câmera (UX/Frontend)
+
+Essa tarefa estava mapeada desde o Épico 2 e faz muita diferença na apresentação do projeto, pois ajuda a evitar que a IA receba fotos ruins. O seu colega pode assumir isso enquanto você lida com os dados.
+
+- **Responsável:** Daniel
+- **Checklist:**
+    - Implementar o Cartão 5: Adicionar um contorno/guia semitransparente na tela da câmera web (overlay).
+    - Adicionar um texto curto na interface indicando a distância e o ângulo corretos para o usuário fotografar a banda de rodagem.
+- **Etiquetas:** 🔵 Frontend, 🟡 UX / UI
+
+### 3. Polimento de Resultados e Feedback Visual
+
+Para a banca ou o usuário final, a percepção de valor acontece aqui. Vocês já estruturaram isso na Sprint 4, agora é só garantir que não quebre.
+
+- **Responsável:** Daniel
+- **Checklist:**
+    - Validar se as animações de "Analisando pneu com IA..." (loading states) estão aparecendo corretamente durante o POST para a API.
+    - Garantir que o componente do "Gauge" (velocímetro) ou barra de progresso esteja refletindo corretamente os dados numéricos de vida útil calculados pelo backend.
+- **Etiquetas:** 🔵 Frontend
+
+### 4. Deploy Final e Homologação (Testes de Ponta a Ponta)
+
+Essa etapa precisa ser feita em conjunto para garantir que as duas pontas (Front e Back) se conversem perfeitamente na nuvem.
+
+- **Responsável:** Leandro e Daniel
+- **Checklist:**
+    - **Leandro:** Revisar a camada de persistência para garantir que o banco de dados SQLite está salvando corretamente o histórico de análises (Data, Diagnóstico e Confiança) no ambiente de produção.
+    - **Leandro:** Efetivar o deploy final do backend (ex: AWS, Render ou Heroku) validando as variáveis de ambiente.
+    - **Colega:** Testar o fluxo completo em um celular físico usando o link público (tirar a foto guiada pelo overlay, aguardar o loading, ler a dica dinâmica de manutenção e o diagnóstico).
+- **Etiquetas:** 🟢 Backend, 🔵 Frontend
