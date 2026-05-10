@@ -3,9 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scanner de Pneus</title>
+    <title>ScannerPneuIA - Análise Premium de Pneus</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Efeito de fundo animado com gradientes */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at 20% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+            animation: gradientShift 15s ease-in-out infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% {
+                opacity: 0.5;
+                transform: translateY(0px);
+            }
+            50% {
+                opacity: 0.8;
+                transform: translateY(20px);
+            }
+        }
+
+        .container-main {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Card principal com glassmorphism */
+        .card-premium {
+            background: rgba(20, 20, 35, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 48px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4),
+                        inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            animation: slideInUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            opacity: 0;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header do card */
+        .card-header {
+            margin-bottom: 32px;
+            text-align: center;
+            animation: fadeInDown 0.6s ease-out 0.2s both;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff 0%, #b4c7ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .card-header p {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 400;
+            letter-spacing: 0.3px;
+        }
+
+        /* Container da câmera */
+        #camera-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: linear-gradient(135deg, rgba(20, 20, 35, 0.9) 0%, rgba(30, 30, 50, 0.9) 100%);
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 28px;
+            animation: fadeIn 0.4s ease-out 0.3s both;
+            box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.05),
+                        0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        #camera-stream {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
         /* Overlay da câmera (guia de alinhamento) */
         .camera-overlay {
             position: absolute;
@@ -14,64 +164,483 @@
             transform: translate(-50%, -50%);
             width: 70%;
             height: 60%;
-            border: 4px dashed rgba(255, 255, 255, 0.7);
-            border-radius: 12px;
-            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(59, 130, 246, 0.6);
+            border-radius: 16px;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4),
+                        inset 0 0 30px rgba(59, 130, 246, 0.1);
             pointer-events: none;
+            animation: pulseOverlay 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseOverlay {
+            0%, 100% {
+                box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4),
+                            inset 0 0 30px rgba(59, 130, 246, 0.1),
+                            0 0 20px rgba(59, 130, 246, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4),
+                            inset 0 0 30px rgba(59, 130, 246, 0.15),
+                            0 0 40px rgba(59, 130, 246, 0.3);
+            }
+        }
+
+        /* Container de botões */
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 28px;
+            animation: fadeIn 0.4s ease-out 0.4s both;
+        }
+
+        /* Botões modernos */
+        .btn-premium {
+            width: 100%;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            overflow: hidden;
+            position: relative;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-premium::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .btn-premium:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4),
+                        inset -2px -2px 5px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(59, 130, 246, 0.5),
+                        inset -2px -2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4),
+                        inset -2px -2px 5px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.5),
+                        inset -2px -2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Estado de loading */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .spinner-premium {
+            width: 60px;
+            height: 60px;
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .spinner-premium::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 3px solid rgba(59, 130, 246, 0.2);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .spinner-premium::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 3px solid transparent;
+            border-top: 3px solid #3b82f6;
+            border-right: 3px solid #8b5cf6;
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite reverse;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        #loading-text {
+            font-size: 14px;
+            color: rgba(180, 199, 255, 0.9);
+            font-weight: 500;
+            letter-spacing: 0.2px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.7;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* Card de resultado */
+        .result-card-container {
+            animation: slideInUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .result-card {
+            background: rgba(20, 20, 35, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1.5px solid;
+            border-radius: 20px;
+            padding: 28px;
+            margin-top: 20px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .result-card.status-bom {
+            border-color: rgba(16, 185, 129, 0.4);
+            background: rgba(16, 185, 129, 0.08);
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.15);
+        }
+
+        .result-card.status-atencao {
+            border-color: rgba(251, 146, 60, 0.4);
+            background: rgba(251, 146, 60, 0.08);
+            box-shadow: 0 15px 40px rgba(251, 146, 60, 0.15);
+        }
+
+        .result-card.status-careca {
+            border-color: rgba(239, 68, 68, 0.4);
+            background: rgba(239, 68, 68, 0.08);
+            box-shadow: 0 15px 40px rgba(239, 68, 68, 0.15);
+        }
+
+        #result-title {
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+            letter-spacing: -0.3px;
+        }
+
+        .status-bom #result-title {
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .status-atencao #result-title {
+            background: linear-gradient(135deg, #fb923c 0%, #fbbf24 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .status-careca #result-title {
+            background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Barra de vida útil (Gauge) */
+        .gauge-container {
+            margin-bottom: 24px;
+        }
+
+        .gauge-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 8px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .gauge-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        #barra-vida {
+            height: 100%;
+            border-radius: 10px;
+            transition: all 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5),
+                        inset 0 1px 2px rgba(255, 255, 255, 0.2);
+        }
+
+        .status-bom #barra-vida {
+            background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+        }
+
+        .status-atencao #barra-vida {
+            background: linear-gradient(90deg, #fb923c 0%, #fbbf24 100%);
+        }
+
+        .status-careca #barra-vida {
+            background: linear-gradient(90deg, #ef4444 0%, #f87171 100%);
+        }
+
+        /* Textos de resultado */
+        .result-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .info-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+        }
+
+        /* Recomendações */
+        .recommendations-section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .recommendations-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 12px;
+        }
+
+        #dicas-lista {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        #dicas-lista li {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.75);
+            line-height: 1.5;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        #dicas-lista li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: rgba(59, 130, 246, 0.8);
+            font-weight: bold;
+        }
+
+        /* Botão de reset */
+        .btn-reset {
+            width: 100%;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            backdrop-filter: blur(10px);
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-reset:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+
+        /* Canvas escondido */
+        canvas {
+            display: none !important;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .card-premium {
+                padding: 32px 24px;
+                border-radius: 20px;
+            }
+
+            .card-header h1 {
+                font-size: 26px;
+            }
+
+            .result-info {
+                grid-template-columns: 1fr;
+            }
+
+            #result-title {
+                font-size: 20px;
+            }
+
+            .btn-premium {
+                padding: 12px 20px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container-main {
+                padding: 16px;
+            }
+
+            .card-premium {
+                padding: 24px 16px;
+                border-radius: 16px;
+            }
+
+            .card-header h1 {
+                font-size: 22px;
+            }
+
+            .card-header p {
+                font-size: 12px;
+            }
         }
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
-
-    <div class="bg-white p-6 rounded-2xl shadow-lg max-w-sm w-full text-center">
-        <h1 class="text-2xl font-bold text-gray-800 mb-2">Scanner de Pneus</h1>
-        <p class="text-gray-500 text-sm mb-6">Alinhe a banda de rodagem no guia e capture.</p>
-
-        <div id="camera-container" class="relative w-full h-64 bg-black rounded-lg overflow-hidden mb-4 hidden">
-            <video id="camera-stream" class="w-full h-full object-cover" autoplay playsinline></video>
-            <div class="camera-overlay"></div>
-        </div>
-
-        <div id="action-buttons" class="flex flex-col gap-3 mb-4">
-            <button id="btn-start-camera" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition">
-                Abrir Câmera
-            </button>
-            <button id="btn-capture" class="hidden w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition">
-                Capturar e Analisar
-            </button>
-        </div>
-
-        <canvas id="canvas" class="hidden"></canvas>
-
-        <!-- Estado de Loading com texto dinâmico -->
-        <div id="loading-state" class="hidden flex flex-col items-center justify-center py-6">
-            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-3"></div>
-            <p id="loading-text" class="text-gray-600 font-medium">Analisando sulcos do pneu...</p>
-        </div>
-
-        <!-- Card de Resultado Atualizado (Sprint 4) -->
-        <div id="result-card" class="hidden p-4 rounded-lg border-2 mt-4 transition-colors duration-300 text-left">
-            <h2 id="result-title" class="text-xl font-bold mb-1 text-center"></h2>
-            
-            <!-- Barra de Vida Útil (Gauge) -->
-            <div class="w-full bg-gray-200 rounded-full h-3 mb-2 mt-3">
-                <div id="barra-vida" class="bg-green-500 h-3 rounded-full transition-all duration-1000" style="width: 0%"></div>
+<body>
+    <div class="container-main">
+        <div class="card-premium">
+            <div class="card-header">
+                <h1>ScannerPneuIA</h1>
+                <p>ANÁLISE INTELIGENTE DE DESGASTE DE PNEUS</p>
             </div>
 
-            <p id="result-km" class="text-sm font-bold text-center mb-1"></p>
-            <p id="result-confidence" class="text-xs font-medium text-center opacity-80 mb-3"></p>
-            
-            <!-- Recomendações Dinâmicas -->
-            <div class="mt-3 bg-white bg-opacity-50 p-3 rounded-lg">
-                <h3 class="text-sm font-bold border-b pb-1 mb-2">Recomendações:</h3>
-                <ul id="dicas-lista" class="list-disc pl-5 text-xs"></ul>
+            <div id="camera-container" class="hidden">
+                <video id="camera-stream" autoplay playsinline></video>
+                <div class="camera-overlay"></div>
             </div>
 
-            <button onclick="location.reload()" class="mt-4 w-full bg-white hover:bg-gray-100 text-gray-800 border border-gray-300 font-semibold py-2 px-4 rounded-lg transition shadow-sm">
-                Nova Análise
-            </button>
+            <div id="action-buttons" class="button-group">
+                <button id="btn-start-camera" class="btn-premium btn-primary">
+                    Iniciar Câmera
+                </button>
+                <button id="btn-capture" class="hidden btn-premium btn-success">
+                    Capturar e Analisar
+                </button>
+            </div>
+
+            <div id="loading-state" class="hidden">
+                <div class="loading-container">
+                    <div class="spinner-premium"></div>
+                    <p id="loading-text">Analisando sulcos do pneu...</p>
+                </div>
+            </div>
+
+            <div id="result-card" class="hidden result-card-container">
+                <div class="result-card">
+                    <h2 id="result-title"></h2>
+                    
+                    <div class="gauge-container">
+                        <div class="gauge-label">Vida Útil Remanescente</div>
+                        <div class="gauge-bar">
+                            <div id="barra-vida" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="result-info">
+                        <div class="info-box">
+                            <div class="info-label">Confiança da IA</div>
+                            <div class="info-value" id="result-confidence">0%</div>
+                        </div>
+                        <div class="info-box">
+                            <div class="info-label">Estimativa de Vida</div>
+                            <div class="info-value" id="result-km">—</div>
+                        </div>
+                    </div>
+
+                    <div class="recommendations-section">
+                        <div class="recommendations-title">⚡ Recomendações</div>
+                        <ul id="dicas-lista"></ul>
+                    </div>
+
+                    <button onclick="location.reload()" class="btn-reset">
+                        Nova Análise
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
+
+    <canvas id="canvas"></canvas>
 
     <script>
         const video = document.getElementById('camera-stream');
@@ -164,41 +733,45 @@
             resultCard.classList.remove('hidden');
 
             const statusLower = data.status.toLowerCase();
+            const resultCardElement = document.querySelector('.result-card');
             
-            // Textos básicos
-            resultConfidence.innerText = `Confiança da IA: ${data.confianca}`;
-            resultKm.innerText = `Estimativa: ${data.km_estimado || 'Indisponível'}`;
+            // Remove classes de status anteriores
+            resultCardElement.classList.remove('status-bom', 'status-atencao', 'status-careca');
+            
+            // Textos formatados premium
+            resultConfidence.innerText = data.confianca;
+            resultKm.innerText = data.km_estimado || '—';
 
             // Renderiza as dicas dinâmicas
             dicasLista.innerHTML = '';
             if(data.dicas && data.dicas.length > 0) {
-                data.dicas.forEach(dica => {
+                data.dicas.forEach((dica) => {
                     const li = document.createElement('li');
                     li.innerText = dica;
                     dicasLista.appendChild(li);
                 });
             }
 
-            // Aplica as cores e ajusta a barra de vida (Gauge)
+            // Aplica as cores e animações baseado no status
             if (statusLower === 'bom') {
-                resultCard.className = 'p-4 rounded-lg border-2 mt-4 bg-green-50 border-green-500 text-green-900 text-left';
-                resultTitle.innerText = 'Pneu Seguro ✅';
-                barraVida.className = 'bg-green-500 h-3 rounded-full transition-all duration-1000';
-                setTimeout(() => barraVida.style.width = '100%', 100);
+                resultCardElement.classList.add('status-bom');
+                resultTitle.innerText = '✓ Pneu Seguro';
+                barraVida.style.width = '100%';
                 
             } else if (statusLower === 'atencao' || statusLower === 'atenção') {
-                resultCard.className = 'p-4 rounded-lg border-2 mt-4 bg-yellow-50 border-yellow-500 text-yellow-900 text-left';
-                resultTitle.innerText = 'Desgaste Moderado ⚠️';
-                barraVida.className = 'bg-yellow-500 h-3 rounded-full transition-all duration-1000';
-                setTimeout(() => barraVida.style.width = '50%', 100);
+                resultCardElement.classList.add('status-atencao');
+                resultTitle.innerText = '⚠ Desgaste Moderado';
+                barraVida.style.width = '50%';
 
+            } else if (statusLower === 'careca') {
+                resultCardElement.classList.add('status-careca');
+                resultTitle.innerText = '✕ Troca Imediata';
+                barraVida.style.width = '10%';
             } else {
-                resultCard.className = 'p-4 rounded-lg border-2 mt-4 bg-red-50 border-red-500 text-red-900 text-left';
-                resultTitle.innerText = 'Troca Imediata ❌';
-                barraVida.className = 'bg-red-600 h-3 rounded-full transition-all duration-1000';
-                setTimeout(() => barraVida.style.width = '10%', 100);
+                // Fallback para status desconhecido
+                resultCardElement.classList.add('status-careca');
+                resultTitle.innerText = '✕ Status Crítico';
+                barraVida.style.width = '15%';
             }
         }
     </script>
-</body>
-</html>
