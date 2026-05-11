@@ -38,7 +38,7 @@ model.classifier[1] = nn.Linear(num_ftrs, len(CLASSES))
 
 try:
     # Busca o modelo na pasta model que você treinou
-    model.load_state_dict(torch.load('model/pneu_model_v1.pth'))
+    model.load_state_dict(torch.load('../model/pneu_model_v1.pth'))
     model.eval()
     print("✅ IA do ScannerPneuIA carregada com sucesso!")
 except Exception as e:
